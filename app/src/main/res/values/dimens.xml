@@ -2,4 +2,8 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="list_date_size">20dp</dimen>
+    <dimen name="list_temp_size">22dp</dimen>
+    <dimen name="list_humidity_size">18dp</dimen>
+    <item name="dimen_alpha" type="dimen" format="float">0.26</item>
 </resources>

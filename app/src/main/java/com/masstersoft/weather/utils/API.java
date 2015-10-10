@@ -16,7 +16,7 @@ import java.net.URLEncoder;
  * Created by Andrey Antonenko on 06.08.2015.
  */
 public class API {
-    public static final String BASE_URL = "";
+    public static final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast";
     public static final int DEFAULT_CONNECTION_TIMEOUT = 15000;
     public static final int DEFAULT_READ_TIMEOUT = 60000;
 
@@ -26,10 +26,10 @@ public class API {
     }
 
     public enum Error {
-        NO_ERROR(0),
-        NO_CONNECTION(0), REQUEST_ERROR(0) // responseCode = 200, success = false
+        NO_ERROR(0)
         , UNKNOWN_ERROR(1) // responseCode != 200
-        , INVALID_BID_PRICE(400), INVALID_TOKEN(401), INVALID_PASSWORD(402), SERVICE_ERROR(500);
+        , INVALID_TOKEN(401) // токен пользователя неверный
+        , SERVICE_ERROR(500); // сервис недоступен
 
         private int code;
 
@@ -47,32 +47,12 @@ public class API {
                     return er;
                 }
             }
-            return Error.REQUEST_ERROR;
+            return Error.UNKNOWN_ERROR;
         }
     }
 
     public enum ApiMethod {
-        GET_API_TOKEN(HttpMethod.GET, "user/auth"),
-        GET_USER_ORDERS(HttpMethod.GET, "user/orders"),
-        GET_CATEGORY_LIST(HttpMethod.GET, "category"),
-        GET_COUNTRY_LIST(HttpMethod.GET, "geo/country"),
-        GET_REGIONS(HttpMethod.GET, "geo/country/%s/regions"),
-        GET_AREAS(HttpMethod.GET, "geo/country/%s/region/%s/areas"),
-        GET_CITIES(HttpMethod.GET, "geo/country/%s/cities"),
-        GET_SUBCATEGORY_LIST(HttpMethod.GET, "category/%s/subcategories"),
-        GET_ALL_ORDERS(HttpMethod.GET, "list"),
-        GET_EXTENDED_ORDER(HttpMethod.GET, "order/%s"),
-        GET_SEARCH_ORDERS(HttpMethod.GET, "list/search"),
-        GET_PAYMENT_TYPES(HttpMethod.GET, "order/%s/suggestion/payment_types"),
-        GET_LOADING_TYPES(HttpMethod.GET, "order/%s/suggestion/loading_types"),
-        GET_TRANSPORT_TYPES(HttpMethod.GET, "order/%s/suggestion/transports"),
-        GET_OTHER_INFO(HttpMethod.GET, "order/%s/suggestion/other"),
-        GET_SUGGESTIONS(HttpMethod.GET, "order/%s/suggestions"),
-        GET_DISCUSSION(HttpMethod.GET, "order/%s/discussion"),
-        POST_ORDER_MESSAGE(HttpMethod.POST, "order/%s/discussion"),
-        GET_SUGGESTION_INFO(HttpMethod.GET, "suggestion/%s"),
-        GET_ORDER_COMMISSION(HttpMethod.GET, "order/%s/price"),
-        POST_NEW_SUGGESTION(HttpMethod.POST, "order/%s/suggestion/add");
+        GET_WEATHER(HttpMethod.GET, "city");
 
         private final String path;
         private final HttpMethod httpMethod;
@@ -107,11 +87,10 @@ public class API {
         public ApiResponse(int statusCode, String responseString) throws IOException, JSONException {
             this.statusCode = statusCode;
             this.json = new JSONObject(responseString);
-            JSONObject tmp = this.json.optJSONObject("error");
             this.success = statusCode == 200;
             if (!success) {
-                this.errorString = tmp.optString("error_message", "");
-                int errorCode = tmp.optInt("code", 0);
+                this.errorString = responseString;
+                int errorCode = 401;
                 this.error = Error.fromCode(errorCode);
 
             } else {
@@ -215,18 +194,8 @@ public class API {
             switch (responseCode) {
                 case 200:
                     return new ApiResponse(responseCode, response);
-                case 400:
-                    if (response.contains("invalid_access_token")) {
-                        return new ApiResponse(Error.INVALID_TOKEN.getCode(), response);
-                    } else
-                        return new ApiResponse(Error.INVALID_BID_PRICE.getCode(), response);
                 case 401:
-                    if (response.contains("invalid_access_token")) {
-                        return new ApiResponse(Error.INVALID_TOKEN.getCode(), response);
-                    }
-                    return new ApiResponse(Error.UNKNOWN_ERROR);
-                case 402:
-                    return new ApiResponse(Error.INVALID_PASSWORD.getCode(), response);
+                    return new ApiResponse(Error.INVALID_TOKEN.getCode(), response);
                 case 500:
                     return new ApiResponse(Error.SERVICE_ERROR.getCode(), response);
                 default:
@@ -269,18 +238,8 @@ public class API {
             switch (responseCode) {
                 case 200:
                     return new ApiResponse(responseCode, response);
-                case 400:
-                    if (response.contains("invalid_access_token")) {
-                        return new ApiResponse(Error.INVALID_TOKEN.getCode(), response);
-                    } else
-                        return new ApiResponse(Error.INVALID_BID_PRICE.getCode(), response);
                 case 401:
-                    if (response.contains("invalid_access_token")) {
-                        return new ApiResponse(Error.INVALID_TOKEN.getCode(), response);
-                    }
-                    return new ApiResponse(Error.UNKNOWN_ERROR);
-                case 402:
-                    return new ApiResponse(Error.INVALID_PASSWORD.getCode(), response);
+                    return new ApiResponse(Error.INVALID_TOKEN.getCode(), response);
                 case 500:
                     return new ApiResponse(Error.SERVICE_ERROR.getCode(), response);
                 default:
