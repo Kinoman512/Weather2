@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
     <ListView
-        android:padding="16dp"
+        android:padding="18dp"
         android:id="@+id/lvWeathers"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
