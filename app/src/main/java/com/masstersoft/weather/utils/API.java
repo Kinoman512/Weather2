@@ -149,6 +149,8 @@ public class API {
         } else {
             throw new IllegalArgumentException("Unknown http method " + method);
         }
+
+
         return response;
     }
 
@@ -175,6 +177,9 @@ public class API {
         InputStream input = null;
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+
+            android.util.Log.e("Weather", url);
+
             connection.setRequestMethod(HttpMethod.GET.toString());
             connection.setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT);
             connection.setReadTimeout(DEFAULT_READ_TIMEOUT);

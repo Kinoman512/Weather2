@@ -1,24 +1,67 @@
 package com.masstersoft.weather.launch;
 
-import android.os.AsyncTask;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.masstersoft.weather.R;
-import com.masstersoft.weather.utils.API;
-
-import java.util.ArrayList;
+import com.masstersoft.weather.model.IWeatherList;
+import com.masstersoft.weather.utils.Persistence;
 
 public class MainActivity extends AppCompatActivity {
+    ListView lw;
+    MenuCityFragment menuCity;
+    Persistence storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getWeather();
+        storage = new Persistence(this);
+
+        menuCity = new MenuCityFragment();
+        setCurrentFragment(menuCity, false);
+
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        if (addToBackStack) transaction.addToBackStack("test");
+        transaction.commit();
+    }
+
+    public void onClickBtn(View view) {
+        IWeatherList iw = menuCity.btnOpenCityClick();
+        if (iw.getCity() == null) {
+            Toast.makeText(this, "Города нет в базе данных!", Toast.LENGTH_SHORT).show();
+        } else {
+            setCurrentFragment(new WeatherCityFragment(iw), true);
+        }
+
+    }
+
+    public void onClickCity(View view) {
+        IWeatherList iw = menuCity.onClickCity(view);
+        if (iw.getCity() == null) {
+            Toast.makeText(this, "Города нет в базе данных!", Toast.LENGTH_SHORT).show();
+        } else {
+            setCurrentFragment(new WeatherCityFragment(iw), true);
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -29,54 +72,38 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
-    private void getWeather() {
 
-        new AsyncTask<Void, Void, API.ApiResponse>() {
+    public void onWeather3(MenuItem i) {
+        changeWeatherMode(3);
+    }
 
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-            }
+    public void onWeather7(MenuItem i) {
+        changeWeatherMode(7);
+    }
 
-            @Override
-            protected API.ApiResponse doInBackground(Void... x) {
-                ArrayList<String> params = new ArrayList<String>();
-                params.add("id");params.add("52489");
-                params.add("APPID");params.add("58c3cdec0969373fd82d01a13c7de5bc");
-                params.add("lang");params.add("ru");
-                params.add("units");params.add("metric");
+    public void onWeather16(MenuItem i) {
+        changeWeatherMode(16);
+    }
 
-                return API.execute(API.ApiMethod.GET_WEATHER.format(), API.HttpMethod.GET, params.toArray(new String[params.size()]));
-            }
+    public void onAbout(MenuItem i) {
+        Toast.makeText(this, " Автор Дмитрий Грибков ", Toast.LENGTH_SHORT).show();
+    }
 
-            @Override
-            protected void onPostExecute(API.ApiResponse apiResponse) {
-                super.onPostExecute(apiResponse);
-                try {
-                    if (apiResponse.isSuccess()) {
-                        android.util.Log.d("Weather",apiResponse.getJson().toString());
+    private void changeWeatherMode(int mode) {
+        storage.setMode(mode);
+        menuCity.onResume();
+        Toast.makeText(this, "Выбрана погода на  " + mode + " дней!", Toast.LENGTH_SHORT).show();
+    }
 
-                    }
+    @Override
+    public void onBackPressed() {
+        if(getFragmentManager().getBackStackEntryCount()>0){
+            getFragmentManager().popBackStack();
+        }else
+        super.onBackPressed();
 
-                } catch (Exception e) {
-                    android.util.Log.e("Weather", "ALERT! ALERT! Exception!", e);
-                } finally {
-
-                }
-            }
-        }.execute();
     }
 }

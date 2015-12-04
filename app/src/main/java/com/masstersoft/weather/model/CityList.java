@@ -1,6 +1,9 @@
 package com.masstersoft.weather.model;
 
+import com.activeandroid.query.Select;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Andrey Antonenko on 03.10.2015.
@@ -10,16 +13,13 @@ public class CityList {
 
     private static CityList instance;
 
-    private void generateCitiesList(){
-        this.cities.add(new City("Rostov-na-Donu","501175","ru"));
-        this.cities.add(new City("Moskva","524894","ru"));
-        this.cities.add(new City("Taganrog","484907","ru"));
-    }
 
     private CityList(){
-        this.cities = new ArrayList<>();
-        generateCitiesList();
+        cities =(ArrayList) new Select()
+                .from(City.class)
+                .execute();
     }
+
     public static CityList getInstance(){
         if(instance == null){
             return new CityList();
@@ -32,6 +32,8 @@ public class CityList {
     public ArrayList<City> getCities(){
         return cities;
     }
+
+
     public int getCount(){
         return this.cities.size();
     }

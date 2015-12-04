@@ -1,9 +1,25 @@
 <resources>
     <string name="app_name">Weather</string>
+    <string name="action_settings">Weather</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="weather3">Погода на 3 дня</string>
+    <string name="weather7">Погода на 7 дня</string>
+    <string name="weather16">Погода на 16 дней</string>
+    <string name="about">О авторе</string>
+
+
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="splash_tv">Моя ПОГОДА</string>
+
+    <string name="btn1">Ростов-на-Дону</string>
+    <string name="btn2">Воронеж</string>
+    <string name="btn3">Ростов-на-Дону</string>
+
+    <string-array name="screen_array">
+        <item>Screen 1</item>
+        <item>Screen 2</item>
+        <item>Screen 3</item>
+    </string-array>
 </resources>

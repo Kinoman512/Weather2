@@ -10,7 +10,7 @@ import com.masstersoft.weather.R;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static long SPLASH_SCREEN_DELAY_MILLIS = 3000;
+    private static long SPLASH_SCREEN_DELAY_MILLIS = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
